@@ -5,14 +5,23 @@ import (
 )
 
 type Book struct {
-	name string
-	description string
-	author string
-	createdAt time.Time
+	Name 				string
+	Description string
+	Author 			string
+	CreatedAt 	time.Time
+	Chapters 		[]Chapter
 }
 
 type Chapter struct {
-	name string
-	number int
-	description string
+	Name 				string
+	Number 			int
+	Description string
+	Path 				string
+	Sections		[]Section
+}
+
+type Section struct {
+	Name 		string
+	Path 		string
+	Content string
 }
