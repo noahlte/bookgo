@@ -22,12 +22,11 @@ var setupCommand = &cobra.Command{
 			return errors.New("You can't create a project without a name (no space)")
 		}
 
-		var filepath string
 		if len(args) > 0 {
-			filepath = strings.Join(args, "-")
+			name = strings.Join(args, " ")
 		}
 
-		return service.SetupBook(name, author, filepath)
+		return service.SetupBook(name, author)
 	},
 }
 

@@ -18,12 +18,12 @@ var addChapterCommand = &cobra.Command{
 			return errors.New("your chapter need a name")
 		}
 
-		var filepath string
+		var name string
 		if len(args) > 0 {
-			filepath = strings.Join(args, "-")
+			name = strings.Join(args, " ")
 		}
 
-		return service.AddChapter(args[0], filepath)
+		return service.AddChapter(name)
 	},
 }
 

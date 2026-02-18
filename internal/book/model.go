@@ -2,8 +2,10 @@ package book
 
 import (
 	"os"
+	"path"
 	"time"
 
+	"github.com/noahlte/bookgo/internal/util"
 	"gopkg.in/yaml.v3"
 )
 
@@ -36,6 +38,20 @@ func (b *Book) UnmarshalBook() error {
 	}
 
 	if err := yaml.Unmarshal(f, &b); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (b *Book) Save() error {
+	data, err := yaml.Marshal(b)
+	if err != nil {
+		return err
+	}
+
+	err = os.WriteFile(path.Join(util.YamlFile), data, 0644)
+	if err != nil {
 		return err
 	}
 
