@@ -14,19 +14,14 @@ import (
 	"github.com/noahlte/bookgo/internal/util"
 )
 
-func SetupBook(name, author string) error {
-	filepath := filesystem.RenameFile(name)
+func SetupBook(newBook book.Book) error {
+	filepath := filesystem.RenameFile(newBook.Name)
 
 	if _, err := os.Stat(filepath); err == nil {
 		return errors.New("book files already exist")
 	}
 
-	userBook := &book.Book{
-		Name: name,
-		Description: "Description...",
-		Author: author,
-		CreatedAt: time.Now(),
-	}
+	newBook.CreatedAt = time.Now()
 
 	err := os.Mkdir(filepath, 0755)
 	if err != nil {
@@ -43,7 +38,7 @@ func SetupBook(name, author string) error {
 		return err
 	}
 
-	data, err := yaml.Marshal(userBook)
+	data, err := yaml.Marshal(newBook)
 	if err != nil {
 		return err
 	}
@@ -53,7 +48,7 @@ func SetupBook(name, author string) error {
 		return err
 	}
 	
-	fmt.Printf("Your book %s has been created !\n", userBook.Name)
+	fmt.Printf("Your book %s has been created !\n", newBook.Name)
 
 	return nil
 }

@@ -11,7 +11,7 @@ import (
 	"github.com/noahlte/bookgo/internal/util"
 )
 
-func AddChapter(name string) error {
+func AddChapter(newChapter *book.Chapter) error {
 	if err := filesystem.FindBookRoot(); err != nil {
 		return err
 	}
@@ -26,7 +26,7 @@ func AddChapter(name string) error {
 
 	chapterNumber := len(userBook.Chapters) + 1
 
-	foldername := filesystem.RenameFile(name)
+	foldername := filesystem.RenameFile(newChapter.Name)
 	
 	filepath := fmt.Sprintf("%d-chapter-%s", chapterNumber, foldername)
 
@@ -34,14 +34,10 @@ func AddChapter(name string) error {
 		return errors.New("this chapter already exist")
 	}
 
-	chapter := &book.Chapter{
-		Name: name,
-		Description: "...",
-		Number: chapterNumber,
-		Path: path.Join(bookPath, util.ContentFile, filepath),
-	}
+	newChapter.Number = chapterNumber
+	newChapter.Path = path.Join(bookPath, util.ContentFile, filepath)
 
-	userBook.Chapters = append(userBook.Chapters, *chapter)
+	userBook.Chapters = append(userBook.Chapters, *newChapter)
 
 	err = os.Mkdir(path.Join(util.ContentFile, filepath), 0755)
 	if err != nil {

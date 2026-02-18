@@ -4,9 +4,12 @@ import (
 	"errors"
 	"strings"
 
+	"github.com/noahlte/bookgo/internal/book"
 	"github.com/noahlte/bookgo/internal/service"
 	"github.com/spf13/cobra"
 )
+
+var chapterDescription string
 
 var addChapterCommand = &cobra.Command{
 	Use: "add-chapter <name>",
@@ -23,10 +26,17 @@ var addChapterCommand = &cobra.Command{
 			name = strings.Join(args, " ")
 		}
 
-		return service.AddChapter(name)
+		newChapter := &book.Chapter{
+			Name: name,
+			Description: bookDescription,
+		}
+
+		return service.AddChapter(newChapter)
 	},
 }
 
 func init() {
 	rootCmd.AddCommand(addChapterCommand)
+
+	addChapterCommand.Flags().StringVarP(&chapterDescription, "description", "d", "...", "Description of the chapter")
 }
