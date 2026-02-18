@@ -10,12 +10,11 @@ import (
 	"gopkg.in/yaml.v3"
 
 	"github.com/noahlte/bookgo/internal/book"
-	"github.com/noahlte/bookgo/internal/filesystem"
 	"github.com/noahlte/bookgo/internal/util"
 )
 
 func SetupBook(newBook book.Book) error {
-	filepath := filesystem.RenameFile(newBook.Name)
+	filepath := util.SanitizeName(newBook.Name)
 
 	if _, err := os.Stat(filepath); err == nil {
 		return errors.New("book files already exist")

@@ -29,7 +29,7 @@ func AddChapter(newChapter *book.Chapter) error {
 
 	chapterNumber := len(userBook.Chapters) + 1
 
-	foldername := filesystem.RenameFile(newChapter.Name)
+	foldername := util.SanitizeName(newChapter.Name)
 	
 	filepath := fmt.Sprintf("%d-chapter-%s", chapterNumber, foldername)
 
