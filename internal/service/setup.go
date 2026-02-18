@@ -2,7 +2,10 @@ package service
 
 import (
 	"fmt"
+	"os"
 	"time"
+
+	"gopkg.in/yaml.v3"
 
 	"github.com/noahlte/bookgo/internal/book"
 )
@@ -23,6 +26,16 @@ func SetupBook(name, author string) error {
 		book.Description, 
 		book.CreatedAt,
 	)
+
+	data, err := yaml.Marshal(book)
+	if err != nil {
+		return err
+	}
+
+	err = os.WriteFile("book.yaml", data, 6444)
+	if err != nil {
+		return err
+	}
 
 	return nil
 }

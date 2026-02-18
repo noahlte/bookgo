@@ -5,11 +5,11 @@ import (
 )
 
 type Book struct {
-	Name 				string
-	Description string
-	Author 			string
-	CreatedAt 	time.Time
-	Chapters 		[]Chapter
+	Name 				string 		`yaml:"name"`
+	Description string 		`yaml:"description"`
+	Author 			string		`yaml:"author"`
+	CreatedAt 	time.Time `yaml:"created-at"`
+	Chapters 		[]Chapter `yaml:"chapters"`
 }
 
 type Chapter struct {
