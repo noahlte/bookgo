@@ -1,17 +1,11 @@
 # BookGo - A simple book creator application in Go
 
----
-
 BookGo is an CLI application that help you create books in Markdown format. Once your book is finished, you can simply convert it into a full pdf file by saying `bookgo build`.
-
----
 
 ## 1. Technology used
 
 - Golang 1.25.4
 - Makefile
-
----
 
 ## 2. How to use it
 
