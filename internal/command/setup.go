@@ -2,6 +2,7 @@ package command
 
 import (
 	"errors"
+	"strings"
 
 	"github.com/noahlte/bookgo/internal/service"
 	"github.com/spf13/cobra"
@@ -10,10 +11,10 @@ import (
 var author string
 
 var setupCommand = &cobra.Command{
-	Use: "new <name> <author>",
+	Use: "new <name>",
 	Short: "Create a new BookGo project",
 	Long: "...",
-	Args: cobra.ExactArgs(1),
+	Args: cobra.MinimumNArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		name := args[0]
 
@@ -21,7 +22,12 @@ var setupCommand = &cobra.Command{
 			return errors.New("You can't create a project without a name (no space)")
 		}
 
-		return service.SetupBook(name, author)
+		var filepath string
+		if len(args) > 0 {
+			filepath = strings.Join(args, "-")
+		}
+
+		return service.SetupBook(name, author, filepath)
 	},
 }
 
