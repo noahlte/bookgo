@@ -1,7 +1,10 @@
 package book
 
 import (
+	"os"
 	"time"
+
+	"gopkg.in/yaml.v3"
 )
 
 type Book struct {
@@ -24,4 +27,17 @@ type Section struct {
 	Name 		string
 	Path 		string
 	Content string
+}
+
+func (b *Book) UnmarshalBook() error {
+	f, err := os.ReadFile("book.yaml") 
+	if err != nil {
+		return err
+	}
+
+	if err := yaml.Unmarshal(f, &b); err != nil {
+		return err
+	}
+
+	return nil
 }

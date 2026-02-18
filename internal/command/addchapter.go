@@ -2,9 +2,9 @@ package command
 
 import (
 	"errors"
-	"fmt"
 	"strings"
 
+	"github.com/noahlte/bookgo/internal/service"
 	"github.com/spf13/cobra"
 )
 
@@ -23,9 +23,7 @@ var addChapterCommand = &cobra.Command{
 			filepath = strings.Join(args, "-")
 		}
 
-		fmt.Printf("New chapter %s created at %s", args[0], filepath)
-
-		return nil
+		return service.AddChapter(args[0], filepath)
 	},
 }
 
