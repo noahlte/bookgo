@@ -13,11 +13,11 @@ type Book struct {
 }
 
 type Chapter struct {
-	Name 				string
-	Number 			int
-	Description string
-	Path 				string
-	Sections		[]Section
+	Name 				string 		`yaml:"name"`
+	Number 			int				`yaml:"number"`
+	Description string		`yaml:"description"`
+	Path 				string		`yaml:"path"`
+	Sections		[]Section	`yaml:"sections"`
 }
 
 type Section struct {

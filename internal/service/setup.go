@@ -57,7 +57,7 @@ func SetupBook(name, author, filepath string) error {
 		return err
 	}
 	
-	fmt.Printf("Your book %s has been created !", book.Name)
+	fmt.Printf("Your book %s has been created !\n", book.Name)
 
 	return nil
 }
