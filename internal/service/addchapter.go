@@ -1,15 +1,20 @@
 package service
 
 import (
+	"embed"
 	"errors"
 	"fmt"
 	"os"
 	"path"
+	"text/template"
 
 	"github.com/noahlte/bookgo/internal/book"
 	"github.com/noahlte/bookgo/internal/filesystem"
 	"github.com/noahlte/bookgo/internal/util"
 )
+
+//go:embed templates/*
+var templateFiles embed.FS
 
 func AddChapter(newChapter *book.Chapter) error {
 	if err := filesystem.FindBookRoot(); err != nil {
@@ -43,6 +48,27 @@ func AddChapter(newChapter *book.Chapter) error {
 	userBook.Chapters = append(userBook.Chapters, *newChapter)
 
 	err = os.Mkdir(path.Join(util.ContentDir, filepath), 0755)
+	if err != nil {
+		return err
+	}
+
+	newSection := &book.SectionTemplate{
+		ChapterName: newChapter.Name,
+		ChapterDescription: newChapter.Description,
+	}
+
+	tmpl, err := template.ParseFS(templateFiles, "templates/new-section.md")
+	if err != nil {
+		return err
+	}
+
+	f, err := os.OpenFile(path.Join(util.ContentDir, filepath, "new-section.md"), os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0600)
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+
+	err = tmpl.Execute(f, *newSection)
 	if err != nil {
 		return err
 	}

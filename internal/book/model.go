@@ -31,6 +31,11 @@ type Section struct {
 	Content string
 }
 
+type SectionTemplate struct {
+	ChapterName string
+	ChapterDescription string
+}
+
 func (b *Book) UnmarshalBook() error {
 	f, err := os.ReadFile("book.yaml") 
 	if err != nil {

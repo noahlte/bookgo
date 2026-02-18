@@ -1,8 +1,8 @@
-# Chapter : {{ chapterName }}
+# Chapter : {{ .ChapterName }}
 
 ---
 
-{{ chapterDescription }}
+{{ .ChapterDescription }}
 
 ---
 

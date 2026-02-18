@@ -28,7 +28,7 @@ var addChapterCommand = &cobra.Command{
 
 		newChapter := &book.Chapter{
 			Name: name,
-			Description: bookDescription,
+			Description: chapterDescription,
 		}
 
 		return service.AddChapter(newChapter)
