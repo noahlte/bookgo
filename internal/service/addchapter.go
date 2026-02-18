@@ -17,7 +17,10 @@ func AddChapter(newChapter *book.Chapter) error {
 	}
 
 	var userBook book.Book
-	userBook.UnmarshalBook()
+	err := userBook.UnmarshalBook()
+	if err != nil {
+		return err
+	}
 
 	bookPath, err := os.Getwd()
 	if err != nil {
@@ -30,21 +33,26 @@ func AddChapter(newChapter *book.Chapter) error {
 	
 	filepath := fmt.Sprintf("%d-chapter-%s", chapterNumber, foldername)
 
-	if _, err := os.Stat(path.Join(util.ContentFile, filepath)); err == nil {
+	if _, err := os.Stat(path.Join(util.ContentDir, filepath)); err == nil {
 		return errors.New("this chapter already exist")
 	}
 
 	newChapter.Number = chapterNumber
-	newChapter.Path = path.Join(bookPath, util.ContentFile, filepath)
+	newChapter.Path = path.Join(bookPath, util.ContentDir, filepath)
 
 	userBook.Chapters = append(userBook.Chapters, *newChapter)
 
-	err = os.Mkdir(path.Join(util.ContentFile, filepath), 0755)
+	err = os.Mkdir(path.Join(util.ContentDir, filepath), 0755)
 	if err != nil {
 		return err
 	}
 
 	err = userBook.Save()
+	if err != nil {
+		return err
+	}
+
+	fmt.Printf("The chapter %s has been created!", newChapter.Name)
 	
 	return nil
 }

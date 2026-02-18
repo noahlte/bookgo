@@ -1,9 +1,9 @@
 package util
 
 const (
-	ContentFile = "content"
-	ImagesFile  = "images"
-	YamlFile    = "book.yaml"
+	ContentDir = "content"
+	ImagesDir  = "images"
+	YamlFile   = "book.yaml"
 )
 
 var (

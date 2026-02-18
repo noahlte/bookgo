@@ -28,12 +28,12 @@ func SetupBook(newBook book.Book) error {
 		return err
 	}
 
-	err = os.Mkdir(path.Join(filepath, util.ContentFile), 0755)
+	err = os.Mkdir(path.Join(filepath, util.ContentDir), 0755)
 	if err != nil {
 		return err
 	}
 
-	err = os.Mkdir(path.Join(filepath, util.ImagesFile), 0755)
+	err = os.Mkdir(path.Join(filepath, util.ImagesDir), 0755)
 	if err != nil {
 		return err
 	}
