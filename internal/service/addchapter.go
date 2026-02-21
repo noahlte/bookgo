@@ -31,11 +31,11 @@ func AddChapter(newChapter *book.Chapter) error {
 	if err != nil {
 		return err
 	}
-
+ 
 	chapterNumber := len(userBook.Chapters) + 1
 
 	foldername := util.SanitizeName(newChapter.Name)
-	
+
 	filepath := fmt.Sprintf("%d-chapter-%s", chapterNumber, foldername)
 
 	if _, err := os.Stat(path.Join(util.ContentDir, filepath)); err == nil {
@@ -53,7 +53,7 @@ func AddChapter(newChapter *book.Chapter) error {
 	}
 
 	newSection := &book.SectionTemplate{
-		ChapterName: newChapter.Name,
+		ChapterName:        newChapter.Name,
 		ChapterDescription: newChapter.Description,
 	}
 
@@ -79,6 +79,6 @@ func AddChapter(newChapter *book.Chapter) error {
 	}
 
 	fmt.Printf("The chapter %s has been created!", newChapter.Name)
-	
+
 	return nil
 }

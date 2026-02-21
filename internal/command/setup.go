@@ -13,15 +13,15 @@ var author string
 var bookDescription string
 
 var setupCommand = &cobra.Command{
-	Use: "new <name>",
+	Use:   "new <name>",
 	Short: "Create a new BookGo project",
-	Long: "...",
-	Args: cobra.MinimumNArgs(1),
+	Long:  "...",
+	Args:  cobra.MinimumNArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		name := args[0]
 
 		if name == "" {
-			return errors.New("You can't create a project without a name (no space)")
+			return errors.New("you can't create a project without a name (no space)")
 		}
 
 		if len(args) > 0 {
@@ -29,8 +29,8 @@ var setupCommand = &cobra.Command{
 		}
 
 		newBook := &book.Book{
-			Name: name,
-			Author: author,
+			Name:        name,
+			Author:      author,
 			Description: bookDescription,
 		}
 
@@ -44,4 +44,3 @@ func init() {
 	setupCommand.Flags().StringVarP(&author, "author", "a", "John Doe", "Author name")
 	setupCommand.Flags().StringVarP(&bookDescription, "description", "d", "...", "Description of the book")
 }
-

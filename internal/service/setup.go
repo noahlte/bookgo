@@ -46,7 +46,7 @@ func SetupBook(newBook book.Book) error {
 	if err != nil {
 		return err
 	}
-	
+
 	fmt.Printf("Your book %s has been created !\n", newBook.Name)
 
 	return nil

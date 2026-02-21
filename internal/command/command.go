@@ -8,7 +8,7 @@ import (
 )
 
 var rootCmd = &cobra.Command{
-	Use: "bookgo",
+	Use:   "bookgo",
 	Short: "Create a PDF Book from markdown files",
 }
 

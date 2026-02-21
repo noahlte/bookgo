@@ -12,10 +12,11 @@ import (
 var chapterDescription string
 
 var addChapterCommand = &cobra.Command{
-	Use: "add-chapter <name>",
+	Use:   "add-chapter <name>",
+	Aliases: []string{"ac", "add-c", "a-chapter"},
 	Short: "Add a new chapter to your book",
-	Long: "...",
-	Args: cobra.MinimumNArgs(1),
+	Long:  "...",
+	Args:  cobra.MinimumNArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		if args[0] == "" {
 			return errors.New("your chapter need a name")
@@ -27,7 +28,7 @@ var addChapterCommand = &cobra.Command{
 		}
 
 		newChapter := &book.Chapter{
-			Name: name,
+			Name:        name,
 			Description: chapterDescription,
 		}
 
