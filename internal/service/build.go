@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/fs"
 	"os"
+	"path"
 	"strings"
 
 	"github.com/noahlte/bookgo/internal/book"
@@ -38,6 +39,10 @@ func scanContent() error {
 	for index, chapter := range chapters {
 		if chapter.IsDir() {
 			prefix := fmt.Sprintf("%d-chapter-", index + 1)
+			bookpath, err := os.Getwd()
+			if err != nil {
+				return err
+			}
 
 			name, ok := strings.CutPrefix(chapter.Name(), prefix)
 			if !ok {
@@ -46,11 +51,23 @@ func scanContent() error {
 
 			name = strings.ReplaceAll(name, "-", " ")
 			capitalizeName := strings.Fields(name)
-			name = util.CapitalizeWords(capitalizeName)
+			name = util.Capitalize(capitalizeName)
+
+			/*
+			TODO: Nested loop for Section
+				- Read chapter dir
+				- See if the dir is empty
+				- Check each file extension to see .md
+				- Analyze content --> to text
+				- Convert each file into Section struct
+				- Add Section truc to a Section array
+				- Add Section array to Chapter
+			*/
 
 			newChapter := &book.Chapter{
 				Name: name,
 				Number: index + 1,
+				Path: path.Join(bookpath, util.ContentDir, chapter.Name()),
 			}
 
 			fmt.Println(newChapter)

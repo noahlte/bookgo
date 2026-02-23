@@ -21,7 +21,6 @@ type Book struct {
 type Chapter struct {
 	Name        string    `yaml:"name"`
 	Number      int       `yaml:"number"`
-	Description string    `yaml:"description"`
 	Path        string    `yaml:"path"`
 	Sections    []Section `yaml:"sections"`
 }
@@ -34,7 +33,7 @@ type Section struct {
 
 type SectionTemplate struct {
 	ChapterName        string
-	ChapterDescription string
+	ChapterNumber 		 int
 }
 
 // Transforme le book.yaml en struct Book

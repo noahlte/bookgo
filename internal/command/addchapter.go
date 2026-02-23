@@ -9,8 +9,6 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var chapterDescription string
-
 var addChapterCommand = &cobra.Command{
 	Use:   "add-chapter <name>",
 	Aliases: []string{"ac", "add-c", "a-chapter"},
@@ -29,7 +27,6 @@ var addChapterCommand = &cobra.Command{
 
 		newChapter := &book.Chapter{
 			Name:        name,
-			Description: chapterDescription,
 		}
 
 		return service.AddChapter(newChapter)
@@ -38,6 +35,4 @@ var addChapterCommand = &cobra.Command{
 
 func init() {
 	rootCmd.AddCommand(addChapterCommand)
-
-	addChapterCommand.Flags().StringVarP(&chapterDescription, "description", "d", "...", "Description of the chapter")
 }

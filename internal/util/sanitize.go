@@ -18,10 +18,8 @@ func SanitizeName(name string) string {
 	return filepath
 }
 
-func CapitalizeWords(name []string) string {
-	for i, word := range name {
-		name[i] = cases.Title(language.English).String(word)
-	}
+func Capitalize(name []string) string {
+	name[0] = cases.Title(language.English).String(name[0])
 
 	return strings.Join(name, " ")
 }

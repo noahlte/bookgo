@@ -54,7 +54,7 @@ func AddChapter(newChapter *book.Chapter) error {
 
 	newSection := &book.SectionTemplate{
 		ChapterName:        newChapter.Name,
-		ChapterDescription: newChapter.Description,
+		ChapterNumber: 			newChapter.Number,
 	}
 
 	tmpl, err := template.ParseFS(templateFiles, "templates/new-section.md")
