@@ -9,6 +9,7 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
+// Book struc s'occupe de garder les donnés du livre et possèdes des méthodes permettant de manipuler celle-ci
 type Book struct {
 	Name        string    `yaml:"name"`
 	Description string    `yaml:"description"`
@@ -36,6 +37,7 @@ type SectionTemplate struct {
 	ChapterDescription string
 }
 
+// Transforme le book.yaml en struct Book
 func (b *Book) UnmarshalBook() error {
 	f, err := os.ReadFile("book.yaml")
 	if err != nil {
@@ -49,6 +51,7 @@ func (b *Book) UnmarshalBook() error {
 	return nil
 }
 
+// Enregistre la struc Book dans un fichier book.yaml
 func (b *Book) Save() error {
 	data, err := yaml.Marshal(b)
 	if err != nil {
