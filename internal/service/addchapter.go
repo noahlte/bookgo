@@ -13,6 +13,11 @@ import (
 	"github.com/noahlte/bookgo/internal/util"
 )
 
+type sectionTemplate struct {
+	ChapterName        string
+	ChapterNumber 		 int
+}
+
 //go:embed templates/*
 var templateFiles embed.FS
 
@@ -52,7 +57,7 @@ func AddChapter(newChapter *book.Chapter) error {
 		return err
 	}
 
-	newSection := &book.SectionTemplate{
+	newSection := sectionTemplate{
 		ChapterName:        newChapter.Name,
 		ChapterNumber: 			newChapter.Number,
 	}
@@ -68,7 +73,7 @@ func AddChapter(newChapter *book.Chapter) error {
 	}
 	defer f.Close()
 
-	err = tmpl.Execute(f, *newSection)
+	err = tmpl.Execute(f, newSection)
 	if err != nil {
 		return err
 	}

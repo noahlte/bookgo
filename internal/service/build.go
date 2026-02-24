@@ -34,7 +34,9 @@ func BuildBook() error {
 	return nil
 }
 
-
+/*
+Une fonction qui va venir scanner l'entièreté du fichier Content afin de mettre à jour le book.yaml pour qu'il n'y est aucune erreur.
+*/
 func scanContent() ([]book.Chapter, error) {
 	bookpath, err := os.Getwd()
 	if err != nil { 
@@ -93,23 +95,23 @@ func scanContent() ([]book.Chapter, error) {
 
 				// TODO: Scan content
 
-				newSection := &book.Section{
+				newSection := book.Section{
 					Name: sectionName,
 					Path: path.Join(bookpath, util.ContentDir, chapter.Name(), section.Name()),
 				}
 
-				sections = append(sections, *newSection)
+				sections = append(sections, newSection)
 			}
 
 
-			newChapter := &book.Chapter{
+			newChapter := book.Chapter{
 				Name: chapterName,
 				Number: index + 1,
 				Path: path.Join(bookpath, util.ContentDir, chapter.Name()),
 				Sections: sections,
 			}
 
-			chapters = append(chapters, *newChapter)
+			chapters = append(chapters, newChapter)
 		}
 	}
 
