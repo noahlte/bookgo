@@ -1,49 +1,111 @@
-# BookGo - A simple book creator application in Go
+# BookGo
 
-BookGo is an CLI application that help you create books in Markdown format. Once your book is finished, you can simply convert it into a full pdf file by saying `bookgo build`.
+> A CLI tool to write books in Markdown and compile them into PDF.
 
-## 1. Technology used
+BookGo is a personal project built to practice Go while solving a real problem: I've always wanted a simple way to write books in Markdown and export them as proper PDFs. This tool lets you structure your content into chapters and sections, manage everything through a CLI, and eventually compile it all into a final document.
 
-- Golang 1.25.4
-- Makefile
+---
 
-## 2. How to use it
+## Tech stack
 
-### a. Create a new book
+| Tool | Purpose |
+|---|---|
+| [Go 1.25](https://go.dev/) | Main language |
+| [Cobra](https://github.com/spf13/cobra) | CLI framework |
+| [gopkg.in/yaml.v3](https://pkg.go.dev/gopkg.in/yaml.v3) | Book metadata serialization |
+| [golang.org/x/text](https://pkg.go.dev/golang.org/x/text) | String utilities |
+| Makefile | Build tooling |
 
-At first, you will need a new project, for that open your terminal and write this command :
+---
+
+## Architecture
+
+```
+bookgo/
+├── cmd/bookgo/
+│   └── main.go                 # Entrypoint
+├── internal/
+│   ├── command/                # Cobra command definitions
+│   │   ├── command.go          # Root command
+│   │   ├── setup.go            # bookgo new
+│   │   ├── addchapter.go       # bookgo add-chapter
+│   │   └── build.go            # bookgo build
+│   ├── service/                # Business logic
+│   │   ├── setup.go            # Book initialization
+│   │   ├── addchapter.go       # Chapter creation
+│   │   ├── build.go            # Build pipeline
+│   │   └── templates/          # Embedded Go templates
+│   │       ├── README.md       # Generated in each new book
+│   │       └── new-section.md  # Generated for each new chapter
+│   ├── book/
+│   │   └── model.go            # Book, Chapter, Section structs + YAML marshaling
+│   ├── filesystem/
+│   │   └── book.go             # Filesystem helpers (book root detection)
+│   └── util/
+│       ├── constant.go         # Shared path constants
+│       └── sanitize.go         # Name sanitization and capitalization
+└── go.mod
+```
+
+The code is organized around a clean separation between commands (CLI layer) and services (logic layer). Commands parse user input and delegate to the corresponding service. The `book` package owns the data model and its persistence to `book.yaml` via YAML marshaling.
+
+Templates are embedded directly into the binary using Go's `embed` package, so the CLI is fully self-contained with no external files needed at runtime.
+
+---
+
+## How it works
+
+### 1. Creating a new book
 
 ```bash
-bookgo new <book-name> --author <author-name> --description <description>
+bookgo new <name> --author <author> --description <description>
 ```
 
-Once your project created you should have a file architecture like this :
+This creates a new directory with the following structure:
 
 ```
-book-name
-  └── content
-  └── images
-  book.yaml
+your-book/
+├── book.yaml    # Auto-generated metadata file, do not edit
+├── content/     # Your chapters go here
+├── images/      # Assets referenced in your markdown
+└── README.md    # Quick reference guide
 ```
 
-**`content`** is where you will add the chapter of your book with the **`add-chapter`** command.
+The `book.yaml` file stores the book's metadata (name, author, description, creation date) and the full chapter/section tree. It is managed automatically by BookGo.
 
-**`images`** is where you will stored the image you used for your book
-
-**`book.yaml`** **DO NOT TOUCH**, it's an auto-generated file that will help the program for the build.
-
-### b. Add a new chapter
-
-To add a new chapter simply write :
+### 2. Adding chapters
 
 ```bash
-bookgo add-chapter <name> --description <description>
+bookgo add-chapter <name>
 ```
 
-This will create a new folder called `x-chapter-name` inside the `content` folder. The x is for the number of the chapter.
+Creates a new folder inside `content/` named `{number}-chapter-{name}`, with a starter section file. The numbering is handled automatically based on the existing chapters.
 
-Inside this folder you will find an auto-generated section. The section are the core of your books. You can have multiple section file by chapters.
+Chapters must always be created with this command to ensure the folder naming convention is respected and the build order stays consistent.
 
-### c. Finaly build your books
+### 3. Writing sections
 
-Work in progress...
+Sections are plain `.md` files inside a chapter folder. There is no command for this, just create the files directly. A few conventions:
+
+- **Order** - sections are compiled in filesystem order. Prefix filenames with numbers to control it: `01-intro.md`, `02-deep-dive.md`.
+- **Title** - the section title is derived from the filename: hyphens become spaces and words are capitalized. `my-first-section.md` becomes *My First Section*.
+
+### 4. Building the book
+
+```bash
+bookgo build
+```
+
+> **Work in progress.** The build command currently scans the `content/` directory and updates `book.yaml`. PDF generation is the next step.
+
+---
+
+## Status
+
+BookGo is a work-in-progress learning project. Core features (project setup, chapter management, content scanning) are functional. PDF generation is still being implemented.
+
+---
+
+## Motivation
+
+I started this project to get hands-on experience with Go, working with the standard library, structuring a real CLI application, and handling file I/O. Writing a book tool felt like the right scope: concrete enough to be useful, complex enough to be a good exercise.
