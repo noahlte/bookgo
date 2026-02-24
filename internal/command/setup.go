@@ -34,7 +34,7 @@ var setupCommand = &cobra.Command{
 			Description: bookDescription,
 		}
 
-		return service.SetupBook(*newBook)
+		return service.SetupBook(newBook)
 	},
 }
 

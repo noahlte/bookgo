@@ -23,7 +23,7 @@ type readMeTemplate struct {
 //go:embed templates/*
 var readmeTemplate embed.FS
 
-func SetupBook(newBook book.Book) error {
+func SetupBook(newBook *book.Book) error {
 	filepath := util.SanitizeName(newBook.Name)
 
 	if _, err := os.Stat(filepath); err == nil {

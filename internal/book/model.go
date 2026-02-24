@@ -28,7 +28,7 @@ type Chapter struct {
 type Section struct {
 	Name    string
 	Path    string
-	Content string
+	Content []byte
 }
 
 // Transforme le book.yaml en struct Book

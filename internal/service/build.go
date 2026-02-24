@@ -18,6 +18,9 @@ func BuildBook() error {
 		return err 
 	}
 
+	content := assembleContent(chapters)
+	fmt.Println(content)
+
 	var userBook book.Book
 	err = userBook.UnmarshalBook()
 	if err != nil { 
@@ -35,7 +38,7 @@ func BuildBook() error {
 }
 
 /*
-Une fonction qui va venir scanner l'entièreté du fichier Content afin de mettre à jour le book.yaml pour qu'il n'y est aucune erreur.
+scanContent va venir scanner l'entièreté du fichier Content afin de mettre à jour le book.yaml pour qu'il n'y est aucune erreur.
 */
 func scanContent() ([]book.Chapter, error) {
 	bookpath, err := os.Getwd()
@@ -71,38 +74,10 @@ func scanContent() ([]book.Chapter, error) {
 			chapterWords := strings.Fields(chapterName)
 			chapterName = util.Capitalize(chapterWords)
 
-			sections := make([]book.Section, 0)
-
-			files, err := os.ReadDir(path.Join(util.ContentDir, chapter.Name()))
-			if err != nil { 
-				return nil, err 
+			sections, err := readSection(chapter.Name(), bookpath)
+			if err != nil {
+				return nil, err
 			}
-			if len(files) == 0 { 
-				return nil, errors.New("a chapter can't be empty") 
-			}
-
-			for _, section := range files {
-				if !strings.HasSuffix(section.Name(), ".md") { continue }
-
-				sectionName, ok := strings.CutSuffix(section.Name(), ".md")
-				if !ok { 
-					return nil, errors.New("can not cut suffix") 
-				}
-
-				sectionName = strings.ReplaceAll(sectionName, "-", " ")
-				sectionWords := strings.Fields(sectionName)
-				sectionName = util.Capitalize(sectionWords)
-
-				// TODO: Scan content
-
-				newSection := book.Section{
-					Name: sectionName,
-					Path: path.Join(bookpath, util.ContentDir, chapter.Name(), section.Name()),
-				}
-
-				sections = append(sections, newSection)
-			}
-
 
 			newChapter := book.Chapter{
 				Name: chapterName,
@@ -116,4 +91,60 @@ func scanContent() ([]book.Chapter, error) {
 	}
 
 	return chapters, nil
+}
+
+// readSection prend un chapitre du livre et vient scanner tout les fichiers .md afin d'en retourner l'ensemble des sections
+func readSection(chapterName string, bookpath string) ([]book.Section, error) {
+	sections := make([]book.Section, 0)
+
+	files, err := os.ReadDir(path.Join(util.ContentDir, chapterName))
+	if err != nil { 
+		return nil, err 
+	}
+	if len(files) == 0 { 
+		return nil, errors.New("a chapter can't be empty") 
+	}
+
+	for _, section := range files {
+		if !strings.HasSuffix(section.Name(), ".md") { continue }
+
+		sectionName, ok := strings.CutSuffix(section.Name(), ".md")
+		if !ok { 
+			return nil, errors.New("can not cut suffix") 
+		}
+
+		sectionName = strings.ReplaceAll(sectionName, "-", " ")
+		sectionWords := strings.Fields(sectionName)
+		sectionName = util.Capitalize(sectionWords)
+
+		data, err := os.ReadFile(path.Join(util.ContentDir, chapterName, section.Name()))
+		if err != nil {
+			return nil, err
+		}
+
+		newSection := book.Section{
+			Name: sectionName,
+			Path: path.Join(bookpath, util.ContentDir, chapterName, section.Name()),
+			Content: data,
+		}
+
+		sections = append(sections, newSection)
+	}
+
+	return sections, nil
+}
+
+func assembleContent(chapters []book.Chapter) []byte {
+	var finalContent []byte
+
+	for _, chapter := range chapters {
+		for _, section := range chapter.Sections {
+			finalContent = append(finalContent, []byte("# " + chapter.Name + "\n\n")...)
+			finalContent = append(finalContent, []byte("## " + section.Name + "\n\n")...)
+			finalContent = append(finalContent, section.Content...)
+			finalContent = append(finalContent, []byte("\n\n")...)
+		}
+	}
+
+	return finalContent
 }
