@@ -211,7 +211,7 @@ func convertHTMLtoPDF(htmlpath, bookpath, bookname string) error {
 		return err
 	}
 
-	_, err = page.Goto(filepath.Join("file:///", htmlpath))
+	_, err = page.Goto("file:///" + filepath.ToSlash(htmlpath))
 	if err != nil {
 		return err
 	}
