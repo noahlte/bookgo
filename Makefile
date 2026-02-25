@@ -23,9 +23,9 @@ build:
 	@go build -trimpath -ldflags="-X main.Version=$(VERSION)" -o bin/${ARTIFACT_NAME}${EXT} cmd/${ARTIFACT_NAME}/main.go
 
 buildall:
-	@GOOS=linux GOARCH=amd64 go build -trimpath -ldflags="-X main.Version=$(VERSION)" -o bin/${ARTIFACT_NAME}-linux cmd/${ARTIFACT_NAME}/main.go
-	@GOOS=windows GOARCH=amd64 go build -trimpath -ldflags="-X main.Version=$(VERSION)" -o bin/${ARTIFACT_NAME}-windows.exe cmd/${ARTIFACT_NAME}/main.go
-	@GOOS=darwin GOARCH=amd64 go build -trimpath -ldflags="-X main.Version=$(VERSION)" -o bin/${ARTIFACT_NAME}-darwin cmd/${ARTIFACT_NAME}/main.go
+	@GOOS=linux GOARCH=amd64 go build -trimpath -ldflags="-X main.Version=$(VERSION)" -o bin/${ARTIFACT_NAME}-linux-amd64 cmd/${ARTIFACT_NAME}/main.go
+	@GOOS=windows GOARCH=amd64 go build -trimpath -ldflags="-X main.Version=$(VERSION)" -o bin/${ARTIFACT_NAME}-windows-amd64.exe cmd/${ARTIFACT_NAME}/main.go
+	@GOOS=darwin GOARCH=amd64 go build -trimpath -ldflags="-X main.Version=$(VERSION)" -o bin/${ARTIFACT_NAME}-darwin-amd64 cmd/${ARTIFACT_NAME}/main.go
 
 run:
 	@go run cmd/${ARTIFACT_NAME}/main.go

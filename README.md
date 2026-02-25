@@ -62,7 +62,7 @@ Templates are embedded directly into the binary using Go's `embed` package, so t
 ### 1. Install BookGo
 
 ```bash
-go install github.com/noahlte/bookgo@latest
+go install github.com/noahlte/bookgo/cmd/bookgo@latest
 ```
 
 ### 2. Install Playwright and its browser dependencies
