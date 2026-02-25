@@ -179,7 +179,6 @@ func convertToHTML(content []byte) (string, error) {
 }
 
 func convertHTMLtoPDF(htmlpath, bookpath, bookname string) error {
-	htmlpath = filepath.FromSlash(htmlpath)
 	bookname = util.SanitizeName(bookname)
 
 	err := os.MkdirAll("dist", 0755)
