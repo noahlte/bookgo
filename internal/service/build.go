@@ -6,15 +6,24 @@ import (
 	"io/fs"
 	"os"
 	"path"
+	"path/filepath"
 	"strings"
 
 	"github.com/noahlte/bookgo/internal/book"
 	"github.com/noahlte/bookgo/internal/util"
+	"github.com/playwright-community/playwright-go"
 	"github.com/yuin/goldmark"
 )
 
+
+
 func BuildBook() error {
-	chapters, err := scanContent()
+	var bookpath, err = os.Getwd()
+	if err != nil { 
+		return err 
+	}
+
+	chapters, err := scanContent(bookpath)
 	if err != nil { 
 		return err 
 	}
@@ -33,6 +42,8 @@ func BuildBook() error {
 		return err 
 	}
 
+	convertHTMLtoPDF(htmlpath, bookpath, userBook.Name)
+
 	userBook.Chapters = chapters
 
 	err = userBook.Save()
@@ -46,12 +57,7 @@ func BuildBook() error {
 /*
 scanContent va venir scanner l'entièreté du fichier Content afin de mettre à jour le book.yaml pour qu'il n'y est aucune erreur.
 */
-func scanContent() ([]book.Chapter, error) {
-	bookpath, err := os.Getwd()
-	if err != nil { 
-		return nil, err 
-	}
-
+func scanContent(bookpath string) ([]book.Chapter, error) {
 	if _, err := os.Stat("content"); errors.Is(err, fs.ErrNotExist) {
 		return nil, errors.New("no content directory found")
 	}
@@ -168,4 +174,60 @@ func convertToHTML(content []byte) (string, error) {
 	}
 
 	return path, nil
+}
+
+func convertHTMLtoPDF(htmlpath, bookpath, bookname string) error {
+	htmlpath = filepath.FromSlash(htmlpath)
+	bookname = util.SanitizeName(bookname)
+
+	err := os.Mkdir("dist", 0755)
+	if err != nil {
+		return err
+	}
+
+	pdfpath := path.Join(bookpath, "dist", fmt.Sprintf("%s.pdf", bookname))
+
+	fmt.Println("open pw")
+	pw, err := playwright.Run()
+	if err != nil {
+		return err
+	}
+	defer pw.Stop()
+
+	fmt.Println("open browser")
+	browser, err := pw.Chromium.Launch()
+	if err != nil {
+		return err
+	}
+	defer browser.Close()
+
+	fmt.Println("browser context")
+	context, err := browser.NewContext()
+	if err != nil {
+		return err
+	}
+
+	fmt.Println("browser new page")
+	page, err := context.NewPage()
+	if err != nil {
+		return err
+	}
+
+	fmt.Println("browser go to page")
+	_, err = page.Goto(path.Join("file:///", htmlpath))
+	if err != nil {
+		return err
+	}
+
+	fmt.Println("create pdf")
+	_, err = page.PDF(playwright.PagePdfOptions{
+		Path: playwright.String(pdfpath),
+	})
+	if err != nil {
+		return err
+	}
+
+	fmt.Println("compile pdf finish")
+
+	return nil
 }
