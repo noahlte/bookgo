@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"io/fs"
 	"os"
-	"path"
 	"path/filepath"
 	"strings"
 
@@ -42,7 +41,10 @@ func BuildBook() error {
 		return err 
 	}
 
-	convertHTMLtoPDF(htmlpath, bookpath, userBook.Name)
+	err = convertHTMLtoPDF(htmlpath, bookpath, userBook.Name)
+	if err != nil {
+		return err
+	}
 
 	userBook.Chapters = chapters
 
@@ -94,7 +96,7 @@ func scanContent(bookpath string) ([]book.Chapter, error) {
 			newChapter := book.Chapter{
 				Name: chapterName,
 				Number: index + 1,
-				Path: path.Join(bookpath, util.ContentDir, chapter.Name()),
+				Path: filepath.Join(bookpath, util.ContentDir, chapter.Name()),
 				Sections: sections,
 			}
 
@@ -109,7 +111,7 @@ func scanContent(bookpath string) ([]book.Chapter, error) {
 func readSection(chapterName string, bookpath string) ([]book.Section, error) {
 	sections := make([]book.Section, 0)
 
-	files, err := os.ReadDir(path.Join(util.ContentDir, chapterName))
+	files, err := os.ReadDir(filepath.Join(util.ContentDir, chapterName))
 	if err != nil { 
 		return nil, err 
 	}
@@ -129,14 +131,14 @@ func readSection(chapterName string, bookpath string) ([]book.Section, error) {
 		sectionWords := strings.Fields(sectionName)
 		sectionName = util.Capitalize(sectionWords)
 
-		data, err := os.ReadFile(path.Join(util.ContentDir, chapterName, section.Name()))
+		data, err := os.ReadFile(filepath.Join(util.ContentDir, chapterName, section.Name()))
 		if err != nil {
 			return nil, err
 		}
 
 		newSection := book.Section{
 			Name: sectionName,
-			Path: path.Join(bookpath, util.ContentDir, chapterName, section.Name()),
+			Path: filepath.Join(bookpath, util.ContentDir, chapterName, section.Name()),
 			Content: data,
 		}
 
@@ -161,9 +163,9 @@ func assembleContent(chapters []book.Chapter) []byte {
 }
 
 func convertToHTML(content []byte) (string, error) {
-	path := path.Join(os.TempDir(), "book.html")
+	htmlpath := filepath.Join(os.TempDir(), "book.html")
 
-	f, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0644)
+	f, err := os.OpenFile(htmlpath, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0644)
 	if err != nil {
 		return "", err
 	}
@@ -173,53 +175,47 @@ func convertToHTML(content []byte) (string, error) {
 		return "", err
 	}
 
-	return path, nil
+	return htmlpath, nil
 }
 
 func convertHTMLtoPDF(htmlpath, bookpath, bookname string) error {
 	htmlpath = filepath.FromSlash(htmlpath)
 	bookname = util.SanitizeName(bookname)
 
-	err := os.Mkdir("dist", 0755)
+	err := os.MkdirAll("dist", 0755)
 	if err != nil {
 		return err
 	}
 
-	pdfpath := path.Join(bookpath, "dist", fmt.Sprintf("%s.pdf", bookname))
+	pdfpath := filepath.Join(bookpath, "dist", fmt.Sprintf("%s.pdf", bookname))
 
-	fmt.Println("open pw")
 	pw, err := playwright.Run()
 	if err != nil {
 		return err
 	}
 	defer pw.Stop()
 
-	fmt.Println("open browser")
 	browser, err := pw.Chromium.Launch()
 	if err != nil {
 		return err
 	}
 	defer browser.Close()
 
-	fmt.Println("browser context")
 	context, err := browser.NewContext()
 	if err != nil {
 		return err
 	}
 
-	fmt.Println("browser new page")
 	page, err := context.NewPage()
 	if err != nil {
 		return err
 	}
 
-	fmt.Println("browser go to page")
-	_, err = page.Goto(path.Join("file:///", htmlpath))
+	_, err = page.Goto(filepath.Join("file:///", htmlpath))
 	if err != nil {
 		return err
 	}
 
-	fmt.Println("create pdf")
 	_, err = page.PDF(playwright.PagePdfOptions{
 		Path: playwright.String(pdfpath),
 	})
@@ -227,7 +223,7 @@ func convertHTMLtoPDF(htmlpath, bookpath, bookname string) error {
 		return err
 	}
 
-	fmt.Println("compile pdf finish")
+	fmt.Printf("Your book has been compiled in %s", pdfpath)
 
 	return nil
 }

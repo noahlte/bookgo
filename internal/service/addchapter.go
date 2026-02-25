@@ -5,7 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
-	"path"
+	"path/filepath"
 	"text/template"
 
 	"github.com/noahlte/bookgo/internal/book"
@@ -41,18 +41,18 @@ func AddChapter(newChapter *book.Chapter) error {
 
 	foldername := util.SanitizeName(newChapter.Name)
 
-	filepath := fmt.Sprintf("%d-chapter-%s", chapterNumber, foldername)
+	chapterPath := fmt.Sprintf("%d-chapter-%s", chapterNumber, foldername)
 
-	if _, err := os.Stat(path.Join(util.ContentDir, filepath)); err == nil {
+	if _, err := os.Stat(filepath.Join(util.ContentDir, chapterPath)); err == nil {
 		return errors.New("this chapter already exist")
 	}
 
 	newChapter.Number = chapterNumber
-	newChapter.Path = path.Join(bookPath, util.ContentDir, filepath)
+	newChapter.Path = filepath.Join(bookPath, util.ContentDir, chapterPath)
 
 	userBook.Chapters = append(userBook.Chapters, *newChapter)
 
-	err = os.Mkdir(path.Join(util.ContentDir, filepath), 0755)
+	err = os.Mkdir(filepath.Join(util.ContentDir, chapterPath), 0755)
 	if err != nil {
 		return err
 	}
@@ -67,7 +67,7 @@ func AddChapter(newChapter *book.Chapter) error {
 		return err
 	}
 
-	f, err := os.OpenFile(path.Join(util.ContentDir, filepath, "new-section.md"), os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0600)
+	f, err := os.OpenFile(filepath.Join(util.ContentDir, chapterPath, "new-section.md"), os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0600)
 	if err != nil {
 		return err
 	}

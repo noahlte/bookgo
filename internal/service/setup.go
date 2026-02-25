@@ -5,7 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
-	"path"
+	"path/filepath"
 	"text/template"
 	"time"
 
@@ -24,25 +24,25 @@ type readMeTemplate struct {
 var readmeTemplate embed.FS
 
 func SetupBook(newBook *book.Book) error {
-	filepath := util.SanitizeName(newBook.Name)
+	bookPath := util.SanitizeName(newBook.Name)
 
-	if _, err := os.Stat(filepath); err == nil {
+	if _, err := os.Stat(bookPath); err == nil {
 		return errors.New("book files already exist")
 	}
 
 	newBook.CreatedAt = time.Now()
 
-	err := os.Mkdir(filepath, 0755)
+	err := os.Mkdir(bookPath, 0755)
 	if err != nil {
 		return err
 	}
 
-	err = os.Mkdir(path.Join(filepath, util.ContentDir), 0755)
+	err = os.Mkdir(filepath.Join(bookPath, util.ContentDir), 0755)
 	if err != nil {
 		return err
 	}
 
-	err = os.Mkdir(path.Join(filepath, util.ImagesDir), 0755)
+	err = os.Mkdir(filepath.Join(bookPath, util.ImagesDir), 0755)
 	if err != nil {
 		return err
 	}
@@ -52,7 +52,7 @@ func SetupBook(newBook *book.Book) error {
 		return err
 	}
 
-	err = os.WriteFile(path.Join(filepath, util.YamlFile), data, 0644)
+	err = os.WriteFile(filepath.Join(bookPath, util.YamlFile), data, 0644)
 	if err != nil {
 		return err
 	}
@@ -62,13 +62,13 @@ func SetupBook(newBook *book.Book) error {
 		return err
 	}
 
-	f, err := os.OpenFile(path.Join(filepath, "README.md"), os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0600)
+	f, err := os.OpenFile(filepath.Join(bookPath, "README.md"), os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0600)
 	if err != nil {
 		return err
 	}
 	defer f.Close()
 
-	err = tmpl.Execute(f, readMeTemplate{BookName: newBook.Name, BookPath: filepath})
+	err = tmpl.Execute(f, readMeTemplate{BookName: newBook.Name, BookPath: bookPath})
 	if err != nil {
 		return err
 	}
