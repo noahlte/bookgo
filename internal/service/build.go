@@ -10,6 +10,7 @@ import (
 
 	"github.com/noahlte/bookgo/internal/book"
 	"github.com/noahlte/bookgo/internal/util"
+	"github.com/yuin/goldmark"
 )
 
 func BuildBook() error {
@@ -19,7 +20,12 @@ func BuildBook() error {
 	}
 
 	content := assembleContent(chapters)
-	fmt.Println(content)
+	
+	htmlpath, err := convertToHTML(content)
+	if err != nil {
+		return err
+	}
+	fmt.Println(htmlpath)
 
 	var userBook book.Book
 	err = userBook.UnmarshalBook()
@@ -138,13 +144,28 @@ func assembleContent(chapters []book.Chapter) []byte {
 	var finalContent []byte
 
 	for _, chapter := range chapters {
+		finalContent = append(finalContent, []byte("# " + chapter.Name + "\n\n")...)
 		for _, section := range chapter.Sections {
-			finalContent = append(finalContent, []byte("# " + chapter.Name + "\n\n")...)
-			finalContent = append(finalContent, []byte("## " + section.Name + "\n\n")...)
 			finalContent = append(finalContent, section.Content...)
 			finalContent = append(finalContent, []byte("\n\n")...)
 		}
 	}
 
 	return finalContent
+}
+
+func convertToHTML(content []byte) (string, error) {
+	path := path.Join(os.TempDir(), "book.html")
+
+	f, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0644)
+	if err != nil {
+		return "", err
+	}
+	defer f.Close()
+
+	if err := goldmark.Convert(content, f); err != nil {
+		return "", err
+	}
+
+	return path, nil
 }
