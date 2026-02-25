@@ -2,19 +2,21 @@
 
 > A CLI tool to write books in Markdown and compile them into PDF.
 
-BookGo is a personal project built to practice Go while solving a real problem: I've always wanted a simple way to write books in Markdown and export them as proper PDFs. This tool lets you structure your content into chapters and sections, manage everything through a CLI, and eventually compile it all into a final document.
+BookGo is a personal project built to practice Go while solving a real problem: I've always wanted a simple way to write books in Markdown and export them as proper PDFs. This tool lets you structure your content into chapters and sections, manage everything through a CLI, and compile it all into a final PDF document.
 
 ---
 
 ## Tech stack
 
-| Tool | Purpose |
-|---|---|
-| [Go 1.25](https://go.dev/) | Main language |
-| [Cobra](https://github.com/spf13/cobra) | CLI framework |
-| [gopkg.in/yaml.v3](https://pkg.go.dev/gopkg.in/yaml.v3) | Book metadata serialization |
-| [golang.org/x/text](https://pkg.go.dev/golang.org/x/text) | String utilities |
-| Makefile | Build tooling |
+| Tool                                                                       | Purpose                                     |
+| -------------------------------------------------------------------------- | ------------------------------------------- |
+| [Go 1.25](https://go.dev/)                                                 | Main language                               |
+| [Cobra](https://github.com/spf13/cobra)                                    | CLI framework                               |
+| [Goldmark](https://github.com/yuin/goldmark)                               | Markdown to HTML conversion                 |
+| [Playwright for Go](https://github.com/playwright-community/playwright-go) | HTML to PDF rendering via headless Chromium |
+| [gopkg.in/yaml.v3](https://pkg.go.dev/gopkg.in/yaml.v3)                    | Book metadata serialization                 |
+| [golang.org/x/text](https://pkg.go.dev/golang.org/x/text)                  | String utilities                            |
+| Makefile                                                                   | Build tooling                               |
 
 ---
 
@@ -33,7 +35,7 @@ bookgo/
 │   ├── service/                # Business logic
 │   │   ├── setup.go            # Book initialization
 │   │   ├── addchapter.go       # Chapter creation
-│   │   ├── build.go            # Build pipeline
+│   │   ├── build.go            # Build pipeline (Markdown -> HTML -> PDF)
 │   │   └── templates/          # Embedded Go templates
 │   │       ├── README.md       # Generated in each new book
 │   │       └── new-section.md  # Generated for each new chapter
@@ -49,7 +51,30 @@ bookgo/
 
 The code is organized around a clean separation between commands (CLI layer) and services (logic layer). Commands parse user input and delegate to the corresponding service. The `book` package owns the data model and its persistence to `book.yaml` via YAML marshaling.
 
+The build pipeline works in two steps: Goldmark converts each Markdown section into HTML, then Playwright drives a headless Chromium browser to render the assembled HTML into a PDF.
+
 Templates are embedded directly into the binary using Go's `embed` package, so the CLI is fully self-contained with no external files needed at runtime.
+
+---
+
+## Installation
+
+### 1. Install BookGo
+
+```bash
+go install github.com/noahlte/bookgo@latest
+```
+
+### 2. Install Playwright and its browser dependencies
+
+The PDF build relies on Playwright and a headless Chromium browser. After installing BookGo, run:
+
+```bash
+go install github.com/playwright-community/playwright-go/cmd/playwright@v0.5700.1
+playwright install --with-deps
+```
+
+> This will download Chromium and all system dependencies required for headless rendering. This step is only needed once.
 
 ---
 
@@ -88,7 +113,7 @@ Chapters must always be created with this command to ensure the folder naming co
 Sections are plain `.md` files inside a chapter folder. There is no command for this, just create the files directly. A few conventions:
 
 - **Order** - sections are compiled in filesystem order. Prefix filenames with numbers to control it: `01-intro.md`, `02-deep-dive.md`.
-- **Title** - the section title is derived from the filename: hyphens become spaces and words are capitalized. `my-first-section.md` becomes *My First Section*.
+- **Title** - the section title is derived from the filename: hyphens become spaces and words are capitalized. `my-first-section.md` becomes _My First Section_.
 
 ### 4. Building the book
 
@@ -96,13 +121,17 @@ Sections are plain `.md` files inside a chapter folder. There is no command for 
 bookgo build
 ```
 
-> **Work in progress.** The build command currently scans the `content/` directory and updates `book.yaml`. PDF generation is the next step.
+Scans the `content/` directory, converts every Markdown section to HTML via Goldmark, assembles the full document, then renders it to a PDF using Playwright.
 
 ---
 
-## Status
+## Coming soon
 
-BookGo is a work-in-progress learning project. Core features (project setup, chapter management, content scanning) are functional. PDF generation is still being implemented.
+- **PDF styling** - Custom CSS themes to control fonts, spacing, page layout and overall look of the generated document.
+- **Table of contents** - Auto-generated TOC based on the chapter and section structure, inserted at the beginning of the book.
+- **Custom Markdown converter** - Replace Goldmark with a homemade Markdown parser to have full control over the conversion and remove a third-party dependency.
+- **Remove Chromium requirement** - Explore alternatives to Playwright/Chromium for PDF generation so that users don't need to install a full browser to build their book.
+- **Cover page** - Support for a custom cover page defined in `book.yaml` (title, author, subtitle, date).
 
 ---
 
