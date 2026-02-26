@@ -65,6 +65,9 @@ Templates are embedded directly into the binary using Go's `embed` package, so t
 go install github.com/noahlte/bookgo/cmd/bookgo@latest
 ```
 
+> **Note**: The `go install` method is currently not working as expected on Windows.
+> Please use the binary from the releases page instead.
+
 ### 2. Install Playwright and its browser dependencies
 
 The PDF build relies on Playwright and a headless Chromium browser. After installing BookGo, run:
