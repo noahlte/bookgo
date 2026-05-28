@@ -6,57 +6,6 @@ BookGo is a personal project built to practice Go while solving a real problem: 
 
 ---
 
-## Tech stack
-
-| Tool                                                                       | Purpose                                     |
-| -------------------------------------------------------------------------- | ------------------------------------------- |
-| [Go 1.25](https://go.dev/)                                                 | Main language                               |
-| [Cobra](https://github.com/spf13/cobra)                                    | CLI framework                               |
-| [Goldmark](https://github.com/yuin/goldmark)                               | Markdown to HTML conversion                 |
-| [Playwright for Go](https://github.com/playwright-community/playwright-go) | HTML to PDF rendering via headless Chromium |
-| [gopkg.in/yaml.v3](https://pkg.go.dev/gopkg.in/yaml.v3)                    | Book metadata serialization                 |
-| [golang.org/x/text](https://pkg.go.dev/golang.org/x/text)                  | String utilities                            |
-| Makefile                                                                   | Build tooling                               |
-
----
-
-## Architecture
-
-```
-bookgo/
-├── cmd/bookgo/
-│   └── main.go                 # Entrypoint
-├── internal/
-│   ├── command/                # Cobra command definitions
-│   │   ├── command.go          # Root command
-│   │   ├── setup.go            # bookgo new
-│   │   ├── addchapter.go       # bookgo add-chapter
-│   │   └── build.go            # bookgo build
-│   ├── service/                # Business logic
-│   │   ├── setup.go            # Book initialization
-│   │   ├── addchapter.go       # Chapter creation
-│   │   ├── build.go            # Build pipeline (Markdown -> HTML -> PDF)
-│   │   └── templates/          # Embedded Go templates
-│   │       ├── README.md       # Generated in each new book
-│   │       └── new-section.md  # Generated for each new chapter
-│   ├── book/
-│   │   └── model.go            # Book, Chapter, Section structs + YAML marshaling
-│   ├── filesystem/
-│   │   └── book.go             # Filesystem helpers (book root detection)
-│   └── util/
-│       ├── constant.go         # Shared path constants
-│       └── sanitize.go         # Name sanitization and capitalization
-└── go.mod
-```
-
-The code is organized around a clean separation between commands (CLI layer) and services (logic layer). Commands parse user input and delegate to the corresponding service. The `book` package owns the data model and its persistence to `book.yaml` via YAML marshaling.
-
-The build pipeline works in two steps: Goldmark converts each Markdown section into HTML, then Playwright drives a headless Chromium browser to render the assembled HTML into a PDF.
-
-Templates are embedded directly into the binary using Go's `embed` package, so the CLI is fully self-contained with no external files needed at runtime.
-
----
-
 ## Installation
 
 ### 1. Install BookGo
